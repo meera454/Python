@@ -1,4 +1,4 @@
-#this code is bit different from "multi-table_tracks_demo.py", added a Genre table
+#this code is bit different from "multi-table_tracks_demo.py", added a Genre table.
 
 import xml.etree.ElementTree as ET
 import sqlite3
