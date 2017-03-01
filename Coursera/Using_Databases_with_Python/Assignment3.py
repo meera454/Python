@@ -1,3 +1,5 @@
+#this code is bit different from "multi-table_tracks_demo.py", added a Genre table
+
 import xml.etree.ElementTree as ET
 import sqlite3
 
@@ -30,6 +32,7 @@ CREATE TABLE Track (
         AUTOINCREMENT UNIQUE,
     title TEXT  UNIQUE,
     album_id  INTEGER,
+    genre_id INTEGER,
     len INTEGER, rating INTEGER, count INTEGER
 );
 ''')
@@ -63,15 +66,20 @@ for entry in all:
     rating = lookup(entry, 'Rating')
     length = lookup(entry, 'Total Time')
 
-    if name is None or artist is None or album is None : 
+    if name is None or artist is None or album is None or genre is None : 
         continue
 
-    print name, artist, album, count, rating, length
+    print name, artist, album, genre, count, rating, length
 
     cur.execute('''INSERT OR IGNORE INTO Artist (name) 
         VALUES ( ? )''', ( artist, ) )
     cur.execute('SELECT id FROM Artist WHERE name = ? ', (artist, ))
     artist_id = cur.fetchone()[0]
+    
+    cur.execute('''INSERT OR IGNORE INTO Genre (name) 
+        VALUES ( ? )''', ( genre,  ) )
+    cur.execute('SELECT id FROM Genre WHERE name = ? ', (genre, ))
+    genre_id = cur.fetchone()[0]
 
     cur.execute('''INSERT OR IGNORE INTO Album (title, artist_id) 
         VALUES ( ?, ? )''', ( album, artist_id ) )
@@ -79,8 +87,8 @@ for entry in all:
     album_id = cur.fetchone()[0]
 
     cur.execute('''INSERT OR REPLACE INTO Track
-        (title, album_id, len, rating, count) 
-        VALUES ( ?, ?, ?, ?, ? )''', 
-        ( name, album_id, length, rating, count ) )
+        (title, album_id, genre_id, len, rating, count) 
+        VALUES ( ?, ?, ?, ?, ?, ? )''', 
+        ( name, album_id, genre_id, length, rating, count ) )
 
     conn.commit()
